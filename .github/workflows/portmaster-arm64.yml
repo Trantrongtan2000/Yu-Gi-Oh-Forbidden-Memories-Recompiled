@@ -20,7 +20,7 @@ jobs:
       - name: Install build tools and libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build clang llvm libpng-dev libfreetype6-dev zlib1g-dev libgles2-mesa-dev libasound2-dev libx11-dev libxext-dev zip
+          sudo apt-get install -y cmake ninja-build clang llvm libpng-dev libfreetype6-dev libfontconfig1-dev zlib1g-dev libgles2-mesa-dev libasound2-dev libx11-dev libxext-dev zip
 
       - name: Build SDL3 from source
         run: |
@@ -34,12 +34,14 @@ jobs:
         run: |
           mkdir -p tmp/pc/linux-deps/lib tmp/pc/linux-deps/include
           cp -r /usr/include/freetype2 tmp/pc/linux-deps/include/ 2>/dev/null || true
+          cp -r /usr/include/fontconfig tmp/pc/linux-deps/include/ 2>/dev/null || true
           cp -r /usr/include/libpng16 tmp/pc/linux-deps/include/ 2>/dev/null || true
           cp -f /usr/include/png*.h tmp/pc/linux-deps/include/ 2>/dev/null || true
           cp -f /usr/include/zlib.h tmp/pc/linux-deps/include/ 2>/dev/null || true
           cp -f /usr/include/zconf.h tmp/pc/linux-deps/include/ 2>/dev/null || true
           cp -f /usr/lib/aarch64-linux-gnu/libpng16.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
           cp -f /usr/lib/aarch64-linux-gnu/libfreetype.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
+          cp -f /usr/lib/aarch64-linux-gnu/libfontconfig.so* tmp/pc/linux-deps/lib/ 2>/dev/null || true
           cp -f /usr/lib/aarch64-linux-gnu/libz.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
 
       - name: Build Yu-Gi-Oh Forbidden Memories Linux ARM64

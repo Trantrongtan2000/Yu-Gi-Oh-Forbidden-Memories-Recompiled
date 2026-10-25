@@ -657,13 +657,17 @@ def link_game(
             *object_arguments(build, [str(path_for("obj", s, ".o")) for s, g in jobs]),
             str(tables_obj), str(export_object),
             f"-L{dependencies / 'lib'}",
-            "-lSDL3", "-lGLESv2", "-lfreetype", "-lpng16", "-lz", "-lm", "-ldl", "-lpthread",
+            "-lSDL3", "-lGLESv2", "-lfontconfig", "-lfreetype", "-lpng16", "-lz", "-lm", "-ldl", "-lpthread",
             "-Wl,-export-dynamic",
         ]
         (build / "link-command.json").write_text(json.dumps(command, indent=2) + "\n")
         status = run_logged(command, build / "logs/link.log")
-        print("Link " + ("failed: " + str(build / "logs/link.log") if status
-                         else "succeeded: " + str(build / "memories-arm64")), flush=True)
+        if status:
+            print("Link failed: " + str(build / "logs/link.log"), flush=True)
+            if (build / "logs/link.log").exists():
+                print((build / "logs/link.log").read_text(), flush=True)
+        else:
+            print("Link succeeded: " + str(build / "memories-arm64"), flush=True)
         return status
     command = [
         cc,
