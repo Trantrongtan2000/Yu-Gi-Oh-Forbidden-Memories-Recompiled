@@ -76,7 +76,7 @@ ANDROID_PACKAGED = ("arm64-v8a",)
 # guest_branches.c, stubs and mod_exports.c hold no G32 stores and are
 # compiled directly.
 PTR32_PASS = A64
-if TARGET not in ("linux", "windows", "windows-x64") and not ANDROID:
+if TARGET not in ("linux", "windows", "windows-x64", "linux-arm64") and not ANDROID:
     sys.exit(f"--target {TARGET}: linux, windows, windows-x64 or android-<abi>")
 # tools/pc/build_win32_deps.py (--arch x86_64 for the 64-bit build)
 WIN32_DEPS = "tmp/pc/win64-deps" if X64 else "tmp/pc/win32-deps"

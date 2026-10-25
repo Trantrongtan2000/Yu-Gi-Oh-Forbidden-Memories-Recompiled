@@ -63,6 +63,18 @@ def c_symbol(name):
     return name[1:] if name.startswith("_") else None
 
 
+def release_version():
+    import re, subprocess
+    version = os.environ.get("MEMORIES_VERSION")
+    if version is None:
+        try:
+            version = subprocess.run(["git", "describe", "--tags", "--exact-match", "--match", "v[0-9]*"],
+                                     capture_output=True, text=True).stdout.strip()
+        except OSError:
+            version = ""
+    return version if re.fullmatch(r"v\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?", version) else ""
+
+
 ORDINARY = {
     "src/pc/memory.c",
     "src/pc/guest/state_translated.c",
@@ -497,7 +509,6 @@ def generate_function_tables(
         + hashlib.sha256("".join(raw_text.values()).encode()).hexdigest()[:8]
         + "u;\n"
     )
-    from build_game32 import release_version
 
     tables += f"const char Memories_Version[] = {json.dumps(release_version())};\n"
     build_label = os.environ.get("MEMORIES_VERSION") or "dev-" + revision[:12]
@@ -961,7 +972,6 @@ def main():
     status = link_game(
         build, jobs, path_for, tables, export_object, cc, sdk, flags, dependencies
     )
-    from build_game32 import release_version
 
     if not status:
         identity = dict(
