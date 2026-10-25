@@ -816,6 +816,7 @@ def main():
         "-fcommon",
         "-I" + str(dependencies / "include"),
         "-I" + str(dependencies / "include/freetype2"),
+        "-I/usr/include/freetype2",
         "-w",
         "-Wno-incompatible-pointer-types",
         "-Wno-int-conversion",

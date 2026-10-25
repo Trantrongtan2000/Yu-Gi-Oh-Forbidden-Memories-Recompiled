@@ -32,7 +32,12 @@ jobs:
 
       - name: Prepare dependency directory structure
         run: |
-          mkdir -p tmp/pc/linux-deps/lib
+          mkdir -p tmp/pc/linux-deps/lib tmp/pc/linux-deps/include
+          cp -r /usr/include/freetype2 tmp/pc/linux-deps/include/ 2>/dev/null || true
+          cp -r /usr/include/libpng16 tmp/pc/linux-deps/include/ 2>/dev/null || true
+          cp -f /usr/include/png*.h tmp/pc/linux-deps/include/ 2>/dev/null || true
+          cp -f /usr/include/zlib.h tmp/pc/linux-deps/include/ 2>/dev/null || true
+          cp -f /usr/include/zconf.h tmp/pc/linux-deps/include/ 2>/dev/null || true
           cp -f /usr/lib/aarch64-linux-gnu/libpng16.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
           cp -f /usr/lib/aarch64-linux-gnu/libfreetype.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
           cp -f /usr/lib/aarch64-linux-gnu/libz.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
