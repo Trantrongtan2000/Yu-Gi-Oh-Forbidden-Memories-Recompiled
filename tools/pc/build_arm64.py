@@ -674,7 +674,7 @@ def link_game(
             *object_arguments(build, [str(path_for("obj", s, ".o")) for s, g in jobs]),
             str(tables_obj), str(export_object),
             f"-L{dependencies / 'lib'}",
-            "-lSDL3", "-lGLESv2", "-lfontconfig", "-lfreetype", "-lpng16", "-lz", "-lbz2", "-lbrotlidec", "-lm", "-ldl", "-lpthread",
+            "-lSDL3", "-lGL", "-lGLESv2", "-lfontconfig", "-lfreetype", "-lpng16", "-lz", "-lbz2", "-lbrotlidec", "-lm", "-ldl", "-lpthread",
             "-Wl,-export-dynamic",
         ]
         (build / "link-command.json").write_text(json.dumps(command, indent=2) + "\n")
