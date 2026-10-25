@@ -20,7 +20,7 @@ jobs:
       - name: Install build tools and libraries
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build clang llvm libpng-dev libfreetype6-dev libfontconfig1-dev zlib1g-dev libgles2-mesa-dev libasound2-dev libx11-dev libxext-dev zip
+          sudo apt-get install -y cmake ninja-build clang llvm libpng-dev libfreetype6-dev libfontconfig1-dev zlib1g-dev libbz2-dev libbrotli-dev libgles2-mesa-dev libasound2-dev libx11-dev libxext-dev zip
 
       - name: Build SDL3 from source
         run: |
