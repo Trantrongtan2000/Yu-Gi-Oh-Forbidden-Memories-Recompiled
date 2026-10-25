@@ -58,7 +58,7 @@ NM = "nm"
 
 def c_symbol(name):
     """An object-file symbol's C name: Mach-O prefixes an underscore, ELF not."""
-    if ANDROID_BIN:
+    if ANDROID_BIN or os.environ.get("MEMORIES_TARGET") == "linux-arm64":
         return name
     return name[1:] if name.startswith("_") else None
 
@@ -434,7 +434,11 @@ def generate_function_tables(
     for text in raw_text.values():
         for name, signature in inspect(text)["signatures"].items():
             if name in direct_overlay_bridges:
-                validate_signature(name, signature, aapcs64=ANDROID_BIN is not None)
+                validate_signature(
+                    name,
+                    signature,
+                    aapcs64=ANDROID_BIN is not None or os.environ.get("MEMORIES_TARGET") == "linux-arm64",
+                )
     stubs = sorted(
         (
             all_declarations
@@ -545,7 +549,9 @@ def generate_mod_exports(
     )
     symbols = sorted(set(exports.values()))
     export_table = "#include <stdint.h>\ntypedef struct { const char *name; void *address; } MemoriesModExport;\n"
-    prefix = "" if ANDROID_BIN else "_"  # ELF names have no Mach-O underscore
+    prefix = (
+        "" if (ANDROID_BIN or os.environ.get("MEMORIES_TARGET") == "linux-arm64") else "_"
+    )  # ELF names have no Mach-O underscore
     for index, name in enumerate(symbols):
         export_table += f'extern char ModExport_{index}[] __asm__("{prefix}{name}");\n'
     references = {name: f"ModExport_{index}" for index, name in enumerate(symbols)}
