@@ -1,0 +1,59 @@
+name: Build PortMaster ARM64 (R36S)
+
+on:
+  push:
+    branches: [ master, portmaster-arm64 ]
+  workflow_dispatch:
+
+jobs:
+  build-portmaster:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools and libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build libpng-dev libfreetype6-dev zlib1g-dev libgles2-mesa-dev libasound2-dev libx11-dev libxext-dev zip
+
+      - name: Build SDL3 from source
+        run: |
+          mkdir -p tmp/pc/linux-deps
+          git clone --depth 1 --branch release-3.2.4 https://github.com/libsdl-org/SDL.git /tmp/sdl3
+          cmake -S /tmp/sdl3 -B /tmp/sdl3/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/tmp/pc/linux-deps -DSDL_STATIC=ON -DSDL_SHARED=ON -DSDL_TEST_LIBRARY=OFF
+          cmake --build /tmp/sdl3/build -j$(nproc)
+          cmake --install /tmp/sdl3/build
+
+      - name: Prepare dependency directory structure
+        run: |
+          mkdir -p tmp/pc/linux-deps/lib
+          cp -f /usr/lib/aarch64-linux-gnu/libpng16.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
+          cp -f /usr/lib/aarch64-linux-gnu/libfreetype.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
+          cp -f /usr/lib/aarch64-linux-gnu/libz.a tmp/pc/linux-deps/lib/ 2>/dev/null || true
+
+      - name: Build Yu-Gi-Oh Forbidden Memories Linux ARM64
+        run: |
+          python3 tools/pc/build.py --target linux-arm64
+
+      - name: Package for PortMaster (R36S / ArkOS)
+        run: |
+          mkdir -p release/yfm/libs
+          cp tmp/pc/linux-arm64/memories-arm64 release/yfm/
+          cp "portmaster/Yu-Gi-Oh Forbidden Memories.sh" release/
+          cp portmaster/yfm/yfm.gptk release/yfm/
+          cp portmaster/yfm/gameinfo.xml release/yfm/
+          cp -P tmp/pc/linux-deps/lib/libSDL3.so* release/yfm/libs/ 2>/dev/null || true
+          cd release
+          zip -r ../Yu-Gi-Oh-Forbidden-Memories-PortMaster-R36S.zip .
+
+      - name: Upload PortMaster ZIP Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Yu-Gi-Oh-Forbidden-Memories-PortMaster-R36S
+          path: Yu-Gi-Oh-Forbidden-Memories-PortMaster-R36S.zip

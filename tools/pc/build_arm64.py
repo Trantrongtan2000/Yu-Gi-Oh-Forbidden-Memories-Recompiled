@@ -644,6 +644,22 @@ def link_game(
         print("Link " + ("failed: " + str(build / "logs/link.log") if status
                          else "succeeded: " + str(build / "libgame.so")), flush=True)
         return status
+    elif os.environ.get("MEMORIES_TARGET") == "linux-arm64":
+        command = [
+            cc,
+            *darwin_flags(None),
+            "-o", str(build / "memories-arm64"),
+            *object_arguments(build, [str(path_for("obj", s, ".o")) for s, g in jobs]),
+            str(tables_obj), str(export_object),
+            f"-L{dependencies / 'lib'}",
+            "-lSDL3", "-lGLESv2", "-lfreetype", "-lpng16", "-lz", "-lm", "-ldl", "-lpthread",
+            "-Wl,-export-dynamic",
+        ]
+        (build / "link-command.json").write_text(json.dumps(command, indent=2) + "\n")
+        status = run_logged(command, build / "logs/link.log")
+        print("Link " + ("failed: " + str(build / "logs/link.log") if status
+                         else "succeeded: " + str(build / "memories-arm64")), flush=True)
+        return status
     command = [
         cc,
         *darwin_flags(sdk),
@@ -709,7 +725,7 @@ def link_game(
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--target", choices=("macos", "android-arm64-translated"), default="macos")
+    parser.add_argument("--target", choices=("macos", "android-arm64-translated", "linux-arm64"), default="macos")
     parser.add_argument("--build", type=Path)
     parser.add_argument("--jobs", type=int, default=8)
     parser.add_argument("--compile-only", action="store_true")
@@ -745,6 +761,13 @@ def main():
         cc = str(ANDROID_BIN / "clang")
         NM = str(ANDROID_BIN / "llvm-nm")
         dependencies = ROOT / "tmp/pc/android-deps/arm64-v8a"
+        sdk = None
+    elif args.target == "linux-arm64":
+        import os
+        os.environ["MEMORIES_TARGET"] = "linux-arm64"
+        cc = str(llvm / "bin/clang") if (llvm is not None and (llvm / "bin/clang").is_file()) else "clang"
+        NM = str(llvm / "bin/llvm-nm") if (llvm is not None and (llvm / "bin/llvm-nm").is_file()) else "nm"
+        dependencies = ROOT / "tmp/pc/linux-deps"
         sdk = None
     else:
         cc = str(llvm / "bin/clang")

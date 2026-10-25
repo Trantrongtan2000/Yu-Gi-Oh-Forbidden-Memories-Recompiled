@@ -52,11 +52,15 @@ def host_llvm():
 
 
 def linux_llvm(version):
-    """The official LLVM release for Linux x86-64 (the release workflow's
-    Android job), fetched and checked by its SHA-256 the first time, of which
-    only the "parts" of linux_toolchain.json are unpacked, into
-    tmp/pc/llvm-linux (unpacked again if one of them is missing)."""
+    """The official LLVM release for Linux (x86-64 or aarch64), fetched and checked
+    by its SHA-256 the first time, of which only the "parts" of linux_toolchain.json
+    are unpacked, into tmp/pc/llvm-linux (unpacked again if one of them is missing)."""
+    import platform
     config = json.loads(LINUX_CONFIG.read_text())
+    if platform.machine() in ("aarch64", "arm64"):
+        config["archive"] = f"LLVM-{version}-Linux-ARM64.tar.xz"
+        config["url"] = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{version}/LLVM-{version}-Linux-ARM64.tar.xz"
+        config["sha256"] = "65ce0b329514e5643407db2d02a5bd34bf33d159055dafa82825c8385bd01993"
     if config["version"] != version:
         raise RuntimeError(f"{LINUX_CONFIG.name} pins LLVM {config['version']}, {CONFIG.name} {version}")
     parts = tuple(config["parts"])

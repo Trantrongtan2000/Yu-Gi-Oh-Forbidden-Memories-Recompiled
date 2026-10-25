@@ -84,6 +84,16 @@ TARGETS = {
         "build": "tmp/pc/macos",
         "executable": "memories-arm64",
     },
+    "linux-arm64": {
+        "platform": "linux",
+        "architecture": "arm64",
+        "abi": "gnu-lp64",
+        "memory_model": "translated-32",
+        "guest_assembly": "translated-arm64",
+        "driver": "build_arm64.py",
+        "build": "tmp/pc/linux-arm64",
+        "executable": "memories-arm64",
+    },
 }
 
 BACKENDS = {

@@ -1,5 +1,6 @@
 """Shared guest address tables and Darwin compiler flags for games and mods."""
 
+import os
 from build_config import MACOS_MINIMUM, ROOT
 
 HOST_LIBC = {
@@ -69,10 +70,12 @@ ANDROID_API = 24
 
 
 def darwin_flags(sdk):
-    """Target flags: Darwin with an SDK path, Android arm64 when sdk is None
-    (build_arm64.py --target android-arm64-translated). -fsigned-char: MIPS and Darwin's char is
+    """Target flags: Darwin with an SDK path, Android arm64 when sdk is None,
+    or Linux AArch64 when target is linux-arm64. -fsigned-char: MIPS and Darwin's char is
     signed, Linux AArch64's is not."""
     if sdk is None:
+        if os.environ.get("MEMORIES_TARGET") == "linux-arm64":
+            return ["--target=aarch64-linux-gnu", "-fPIC", "-fsigned-char"]
         # Code mods are ELF objects the game's own loader reads (an app
         # cannot load a library from its data folder, targetSdk 29+):
         # build_mod.py --target aarch64-translated.
@@ -82,6 +85,16 @@ def darwin_flags(sdk):
 
 def guest_frontend_flags(sdk):
     """Preserve the PS1 layout until structured guest-memory lowering."""
+    target_compat = []
+    if sdk is not None:
+        target_compat = ["-D_DARWIN_C_SOURCE"]
+    elif os.environ.get("MEMORIES_TARGET") == "linux-arm64":
+        target_compat = ["-D_GNU_SOURCE", "-DMEMORIES_LINUX"]
+    else:
+        target_compat = [
+            "-I" + str(ROOT / "src/pc/compat/android"),
+            "-include", str(ROOT / "src/pc/compat/android/android_compat.h"),
+        ]
     return [
         *darwin_flags(sdk),
         "-std=gnu11",
@@ -95,9 +108,6 @@ def guest_frontend_flags(sdk):
         "-DMEMORIES_TRANSLATED",
         "-D_LANGUAGE_C",
         "-DLANGUAGE_C",
-        *(["-D_DARWIN_C_SOURCE"] if sdk is not None else [
-            "-I" + str(ROOT / "src/pc/compat/android"),
-            "-include", str(ROOT / "src/pc/compat/android/android_compat.h"),
-        ]),
+        *target_compat,
         "-I" + str(ROOT / "src"),
     ]

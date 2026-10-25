@@ -105,6 +105,7 @@ def check_mod_retail_slots(compiler, flags):
 def check_target_source_contract():
     assert set(BUILD_TARGETS) == {
         "linux",
+        "linux-arm64",
         "windows",
         "windows-x64",
         "macos",
@@ -123,6 +124,7 @@ def check_target_source_contract():
         BUILD_TARGETS[name]["memory_model"] == "fixed-32" for name in fixed_targets
     )
     assert BUILD_TARGETS["macos"]["memory_model"] == "translated-32"
+    assert BUILD_TARGETS["linux-arm64"]["memory_model"] == "translated-32"
 
     for name in fixed_targets:
         sources = set(native_sources(BUILD_TARGETS[name], None))
