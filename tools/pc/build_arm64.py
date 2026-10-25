@@ -165,7 +165,12 @@ def compile_sources(jobs, ordinary, path_for, cc, flags, game_extra, args):
     failures = [s for s, g, status in emitted if status]
     if failures:
         print("IR failures:", len(failures))
-        print("\n".join(failures))
+        first_log = path_for("logs", failures[0], ".emit.log")
+        if first_log.exists():
+            print(f"--- First failure log ({failures[0]}): ---")
+            print(first_log.read_text())
+            print("--- End failure log ---")
+        print("\n".join(failures[:20]))
     return failures
 
 

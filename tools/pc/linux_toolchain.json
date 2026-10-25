@@ -7,9 +7,13 @@
     "bin/llvm-config",
     "bin/lld",
     "bin/ld.lld",
+    "bin/clang",
+    "bin/clang-[0-9]*",
+    "bin/llvm-nm",
     "include/llvm/*",
     "include/llvm-c/*",
-    "lib/libLLVM*"
+    "lib/libLLVM*",
+    "lib/clang/*"
   ],
   "unpacked": [
     "bin/llvm-config",
