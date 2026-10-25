@@ -50,11 +50,12 @@ jobs:
 
       - name: Package for PortMaster (R36S / ArkOS)
         run: |
-          mkdir -p release/yfm/libs
+          mkdir -p release/yfm/libs release/yfm/game
           cp tmp/pc/linux-arm64/memories-arm64 release/yfm/
           cp "portmaster/Yu-Gi-Oh Forbidden Memories.sh" release/
           cp portmaster/yfm/yfm.gptk release/yfm/
           cp portmaster/yfm/gameinfo.xml release/yfm/
+          cp portmaster/yfm/game/README.txt release/yfm/game/ 2>/dev/null || true
           cp -P tmp/pc/linux-deps/lib/libSDL3.so* release/yfm/libs/ 2>/dev/null || true
           cd release
           zip -r ../Yu-Gi-Oh-Forbidden-Memories-PortMaster-R36S.zip .

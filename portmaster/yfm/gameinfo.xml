@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gameList>
+  <game>
+    <path>./Yu-Gi-Oh Forbidden Memories.sh</path>
+    <name>Yu-Gi-Oh! Forbidden Memories</name>
+    <desc>Yu-Gi-Oh! Forbidden Memories recompiled natively for Linux ARM64 PortMaster.</desc>
+    <releasedate>20261025T000000</releasedate>
+    <developer>Konami / Unchiga</developer>
+    <publisher>Konami</publisher>
+    <genre>Card Game / Strategy</genre>
+  </game>
+</gameList>
